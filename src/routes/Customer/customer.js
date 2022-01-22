@@ -1,17 +1,32 @@
-import React, { Fragment } from 'react';
-import { Card, Form, Row, Col, Input, Button, Select, Radio, Table, Divider, Pagination, message } from 'antd';
-import request from 'utils/request'
-import config from 'utils/config'
-import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import style from './customer.less';
+import React, { Fragment } from "react";
+import {
+  Card,
+  Form,
+  Row,
+  Col,
+  Input,
+  Button,
+  Select,
+  Radio,
+  Table,
+  Divider,
+  Pagination,
+  message,
+  AutoComplete
+} from "antd";
+import request from "utils/request";
+import config from "utils/config";
+import moment from "moment";
 
-import AddCustomer from './addCustomer';
-import AddRemark from './addRemark'
+import PageHeaderLayout from "../../layouts/PageHeaderLayout";
+import style from "./customer.less";
 
+import AddCustomer from "./addCustomer";
+import AddRemark from "./addRemark";
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
-const {Option} = Select;
+const { Option } = Select;
 
 export default Form.create()(
   class Customer extends React.Component {
@@ -28,63 +43,64 @@ export default Form.create()(
       isCharge: false,
       isMaster: false,
       userData: [],
+      dataSource: []
     };
 
     async componentDidMount() {
-      const sell = await this.isAuth('sell')
+      const sell = await this.isAuth("sell");
       if (sell) {
         if (sell.code === 0) {
           if (sell.data.tip) {
-            this.setState({ isSell: true })
+            this.setState({ isSell: true });
           }
         }
       }
-      const charge = await this.isAuth('charge')
+      const charge = await this.isAuth("charge");
       if (charge) {
         if (charge.code === 0) {
           if (charge.data.tip) {
-            this.setState({ isCharge: true })
+            this.setState({ isCharge: true });
           }
         }
       }
-      const master = await this.isAuth('master')
+      const master = await this.isAuth("master");
       if (master) {
         if (master.code === 0) {
           if (master.data.tip) {
-            this.setState({ isMaster: true })
+            this.setState({ isMaster: true });
           }
         }
       }
-      const { isSell, isCharge, isMaster } = this.state
+      const { isSell, isCharge, isMaster } = this.state;
       if (!isSell && !isCharge && !isMaster) {
-        window.location.href = '/#/exception/403'
-        return
+        window.location.href = "/#/exception/403";
+        return;
       }
-      this.getPageData(1)
+      this.getPageData(1);
 
-      const url = `${config.apiUrl}/getUserInfo?pageSize=100&pageIndex=1`
+      const url = `${config.apiUrl}/getUserInfo?pageSize=100&pageIndex=1`;
       request(url).then(res => {
         if (res) {
           if (Number(res.code) === 0) {
             this.setState({
-              userData: res.data,
-            })
+              userData: res.data
+            });
           } else {
             message.error(res.error);
           }
         }
-      })
+      });
     }
 
     async isAuth(author) {
-      const id = localStorage.getItem('id')
+      const id = localStorage.getItem("id");
       if (!id) {
-        window.location.href = '/#/login/logout'
-        return
+        window.location.href = "/#/login/logout";
+        return;
       }
-      const url = `${config.apiUrl}/isAuthor?user=${id}&author=${author}`
-      const res = await request(url)
-      return res
+      const url = `${config.apiUrl}/isAuthor?user=${id}&author=${author}`;
+      const res = await request(url);
+      return res;
       // if (res) {
       //   if (res.code === 0){
       //     console.log('res.data.tip', res.data.tip)
@@ -97,104 +113,111 @@ export default Form.create()(
       // }
     }
 
-    onChange = (page) => {
+    onChange = page => {
       this.setState({
-        current: page,
+        current: page
       });
-      this.getPageData(page)
-    }
+      this.props.form.validateFields((error, value) => {
+        if (error) {
+          return;
+        }
+        this.getPageData(page, value);
+      });
+    };
 
-    deleteData = (record) => {
-      const url = `${config.apiUrl}/deleteCustomer`
+    deleteData = record => {
+      const url = `${config.apiUrl}/deleteCustomer`;
       const options = {
-        method: 'POST',
+        method: "POST",
         body: {
           id: record.id,
-          isDelete: 1,
-        },
-      }
+          isDelete: 1
+        }
+      };
       request(url, options).then(res => {
         if (res) {
           if (res.code === 0) {
             message.success(res.data.tip);
-            this.getPageData(1)
+            this.getPageData(1);
           } else {
             message.error(res.error);
           }
         }
-      })
-    }
+      });
+    };
 
     getPageData = (pageIndex, searchData) => {
-      const { isSell, isCharge, isMaster } = this.state
+      const { isSell, isCharge, isMaster } = this.state;
 
-      let searchItem = ""
+      let searchItem = "";
       if (searchData) {
-        const keys = Object.keys(searchData)
+        const keys = Object.keys(searchData);
         keys.forEach(item => {
-          searchItem += `&${item}=${searchData[item]}`
-        })
+          searchItem += `&${item}=${searchData[item]}`;
+        });
       }
-      const userId = localStorage.getItem('id')
+      const userId = localStorage.getItem("id");
       if (userId) {
-        searchItem += `&userId=${userId}`
+        searchItem += `&userId=${userId}`;
       }
-      let tag = ''
+      let tag = "";
       if (isMaster) {
-        tag = 'all'
+        tag = "all";
       } else if (isCharge) {
-        tag = 'dept'
+        tag = "dept";
       } else if (isSell) {
-        tag = 'self'
+        tag = "self";
       }
-      searchItem += `&tag=${tag}`
+      searchItem += `&tag=${tag}`;
       // 获取分页的数据
-      let url = `${config.apiUrl}/getCustomer?isDelete=0&pageSize=10&pageIndex=${pageIndex}${searchItem}`
+      let url = `${
+        config.apiUrl
+      }/getCustomer?isDelete=0&pageSize=10&pageIndex=${pageIndex}${searchItem}`;
       request(url).then(res => {
         if (res) {
           if (res.code === 0) {
             this.setState({
-              listData: res.data,
-            })
+              listData: res.data
+            });
           } else {
             message.error(res.error);
           }
         }
-      })
+      });
       // 获取数据条数
-      url = `${config.apiUrl}/getCustomerCount?isDelete=0${searchItem}`
+      url = `${config.apiUrl}/getCustomerCount?isDelete=0${searchItem}`;
       request(url).then(res => {
         if (res) {
           if (res.code === 0) {
             this.setState({
-              dataCount: res.data[0].count,
-            })
+              dataCount: res.data[0].count
+            });
           } else {
             message.error(res.error);
           }
         }
-      })
-    }
+      });
+    };
 
-    getOneCustomer = async (id) => {
-      const url = `${config.apiUrl}/getOneCustomer?id=${id}`
-      const res = await request(url)
+    getOneCustomer = async id => {
+      const url = `${config.apiUrl}/getOneCustomer?id=${id}`;
+      const res = await request(url);
       if (res) {
         if (res.code === 0) {
           this.setState({
             editData: res.data,
-            isAdd: false,
-          })
+            isAdd: false
+          });
         } else {
           message.error(res.error);
         }
       }
-    }
+    };
 
-    lookDetail = async (id) => {
-      await this.getOneCustomer(id)
-      this.setState({ visible: true })
-    }
+    lookDetail = async id => {
+      await this.getOneCustomer(id);
+      this.setState({ visible: true });
+    };
 
     handleCancel = () => {
       this.setState({ visible: false });
@@ -202,43 +225,89 @@ export default Form.create()(
 
     closeModel = () => {
       this.setState({ visibleRemark: false });
-    }
+    };
 
     searchData = () => {
-      const that = this
       this.props.form.validateFields((error, value) => {
         if (error) {
-          return
+          return;
         }
-        this.getPageData(1, value)
-      })
-    }
+        this.setState({ current: 1 });
+        this.getPageData(1, value);
+      });
+    };
 
     handleFormReset = () => {
       const { form } = this.props;
-      form.resetFields()
-      this.getPageData(1)
-    }
+      form.resetFields();
+      this.getPageData(1);
+    };
 
     searchArea() {
-      const { userData } = this.state
-      const options = userData.map(d => <Option value={d.name}>{d.name}</Option>);
-      console.log('userData', userData)
+      const { userData, isMaster, isCharge, isSell } = this.state;
+      const options = userData.map(d => (
+        <Option value={d.name}>{d.name}</Option>
+      ));
       const { getFieldDecorator } = this.props.form;
+
+      const onSelect = value => {
+        console.log("onSelect", value);
+      };
+
+      const onSearch = searchText => {
+        const { Option } = AutoComplete;
+
+        let tag = "";
+        if (isMaster) {
+          tag = "all";
+        } else if (isCharge) {
+          tag = "dept";
+        } else if (isSell) {
+          tag = "self";
+        }
+        const url = `${
+          config.apiUrl
+        }/getCustomerLike?companyName=${searchText}&tag=${tag}`;
+        request(url).then(res => {
+          if (res) {
+            if (Number(res.code) === 0) {
+              const { data } = res;
+              const dataSource = [];
+              data.forEach(opt => {
+                const { id, companyName, brand, people, isCollaborate } = opt;
+                const str = `公司名称:${companyName} | 品牌名称:${brand} | 跟进人:${people} | 是否合作:${
+                  isCollaborate ? "是" : "否"
+                }`;
+                dataSource.push(
+                  <Option key={id} value={companyName}>
+                    {str}
+                  </Option>
+                );
+              });
+              this.setState({ dataSource });
+            } else {
+              message.error(res.error);
+            }
+          }
+        });
+      };
+
+      const { dataSource } = this.state;
+
       return (
         <Form>
           <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
             <Col md={8} sm={24}>
               <FormItem label="客户搜索">
-                {getFieldDecorator('customer', {
-                  initialValue: '',
+                {getFieldDecorator("customer", {
+                  initialValue: ""
                 })(<Input placeholder="可搜索公司/品牌名称" />)}
               </FormItem>
             </Col>
             <Col md={8} sm={24}>
               <FormItem label="跟进人">
-                {getFieldDecorator('people', {
-                  initialValue: '',
+                {getFieldDecorator("people", {
+                  initialValue: ""
                 })(
                   <Select style={{ width: 150 }} placeholder="选择跟进人搜索">
                     {options}
@@ -248,8 +317,8 @@ export default Form.create()(
             </Col>
             <Col md={8} sm={24}>
               <FormItem label="是否合作">
-                {getFieldDecorator('isCollaborate', {
-                  initialValue: '',
+                {getFieldDecorator("isCollaborate", {
+                  initialValue: ""
                 })(
                   <RadioGroup name="radiogroup">
                     <Radio value={1}>是</Radio>
@@ -259,12 +328,38 @@ export default Form.create()(
               </FormItem>
             </Col>
           </Row>
-          <div style={{ overflow: 'hidden' }}>
-            <span style={{ float: 'right', marginBottom: 24 }}>
-              <Button type="primary" htmlType="submit" onClick={this.searchData}>
+          <Row>
+            <Col md={24}>
+              <FormItem label="客户检索">
+                {getFieldDecorator("companyName", {
+                  initialValue: ""
+                })(
+                  <AutoComplete
+                    dataSource={dataSource}
+                    onSelect={onSelect}
+                    onSearch={onSearch}
+                    placeholder="输入公司名称关键词检索"
+                    dropdownStyle={{ width: 600 }}
+                    style={{ width: 600 }}
+                  />
+                )}
+              </FormItem>
+            </Col>
+          </Row>
+          <div style={{ overflow: "hidden" }}>
+            <span style={{ float: "right", marginBottom: 24 }}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                onClick={this.searchData}
+              >
                 查询
               </Button>
-              <Button type="primary" style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
+              <Button
+                type="primary"
+                style={{ marginLeft: 8 }}
+                onClick={this.handleFormReset}
+              >
                 重置
               </Button>
             </span>
@@ -277,78 +372,104 @@ export default Form.create()(
       this.setState({ visible: true, isAdd: true });
     };
 
-    follow = async (id) => {
-      await this.getOneCustomer(id, { visibleRemark: true })
+    follow = async id => {
+      await this.getOneCustomer(id, { visibleRemark: true });
       this.setState({
-        visibleRemark: true,
-      })
-    }
+        visibleRemark: true
+      });
+    };
 
     render() {
-
       const columns = [
         {
-          title: '公司名称',
-          dataIndex: 'companyName',
-          key: 'companyName',
+          title: "公司名称",
+          dataIndex: "companyName",
+          key: "companyName"
         },
         {
-          title: '客户品牌',
-          dataIndex: 'brand',
-          key: 'brand',
+          title: "录入时间",
+          dataIndex: "createTime",
+          key: "createTime",
+          width: "180px",
+          render: val => {
+            const time = val ? moment(val).format("YYYY-MM-DD HH:mm:ss") : "";
+            return <span>{time === "Invalid date" ? "" : time}</span>;
+          }
         },
         {
-          title: '联系人',
-          dataIndex: 'connect',
-          key: 'connect',
+          title: "客户品牌",
+          dataIndex: "brand",
+          key: "brand"
         },
         {
-          title: '电话',
-          dataIndex: 'phone',
-          key: 'phone',
+          title: "联系人",
+          dataIndex: "connect",
+          key: "connect"
         },
         {
-          title: '微信',
-          dataIndex: 'webchat',
-          key: 'webchat',
+          title: "电话",
+          dataIndex: "phone",
+          key: "phone"
         },
         {
-          title: 'qq',
-          dataIndex: 'qq',
-          key: 'qq',
+          title: "微信",
+          dataIndex: "webchat",
+          key: "webchat"
         },
         {
-          title: '是否合作',
-          dataIndex: 'isCollaborate',
-          key: 'isCollaborate',
-          render: (record) => (
-            <span>{Number(record) === 1 ? '已合作' : '未合作'}</span>
-          ),
+          title: "qq",
+          dataIndex: "qq",
+          key: "qq"
         },
         {
-          title: '跟进人',
-          dataIndex: 'people',
-          key: 'people',
+          title: "是否合作",
+          dataIndex: "isCollaborate",
+          key: "isCollaborate",
+          render: record => (
+            <span>{Number(record) === 1 ? "已合作" : "未合作"}</span>
+          )
         },
         {
-          title: '操作',
-          render: (record) => (
+          title: "跟进人",
+          dataIndex: "people",
+          key: "people"
+        },
+        {
+          title: "操作",
+          render: record => (
             <Fragment>
-              <a onClick={() => { this.follow(record.id) }}>跟进</a>
+              <a
+                onClick={() => {
+                  this.follow(record.id);
+                }}
+              >
+                跟进
+              </a>
               <Divider type="vertical" />
-              <a onClick={() => { this.deleteData(record) }}>删除</a>
+              <a
+                onClick={() => {
+                  this.deleteData(record);
+                }}
+              >
+                删除
+              </a>
               <Divider type="vertical" />
-              <a onClick={() => { this.lookDetail(record.id) }}>查看详情</a>
+              <a
+                onClick={() => {
+                  this.lookDetail(record.id);
+                }}
+              >
+                查看详情
+              </a>
             </Fragment>
-          ),
-        },
+          )
+        }
       ];
 
       return (
         <PageHeaderLayout title="客户录入">
           <Card bordered={false}>
-            {
-              this.state.visible && (
+            {this.state.visible && (
               <AddCustomer
                 visible={this.state.visible}
                 onCancel={this.handleCancel}
@@ -356,10 +477,8 @@ export default Form.create()(
                 editData={this.state.editData}
                 isAdd={this.state.isAdd}
               />
-)
-            }
-            {
-              this.state.visibleRemark && (
+            )}
+            {this.state.visibleRemark && (
               <AddRemark
                 visibleRemark={this.state.visibleRemark}
                 onCancel={this.closeModel}
@@ -367,20 +486,31 @@ export default Form.create()(
                 editData={this.state.editData}
                 isAdd={this.state.isAdd}
               />
-)
-            }
+            )}
             <div className={style.tableList}>
               <div className={style.tableListForm}>{this.searchArea()}</div>
               <div className={style.tableListOperator}>
                 <Button icon="plus" type="primary" onClick={this.addData}>
                   录入客户
                 </Button>
-                <Table columns={columns} rowKey="id" dataSource={this.state.listData} pagination={false} />
-                <Pagination style={{ marginTop: "10px" }} current={this.state.current} onChange={this.onChange} pageSize={10} total={this.state.dataCount} />
+                <Table
+                  columns={columns}
+                  rowKey="id"
+                  dataSource={this.state.listData}
+                  pagination={false}
+                />
+                <Pagination
+                  style={{ marginTop: "10px" }}
+                  current={this.state.current}
+                  onChange={this.onChange}
+                  pageSize={10}
+                  total={this.state.dataCount}
+                />
               </div>
             </div>
           </Card>
         </PageHeaderLayout>
       );
     }
-  })
+  }
+);
