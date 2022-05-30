@@ -6,17 +6,17 @@ export const getAllUserInfo = async () => {
 };
 
 export const getPlan = async (pageIndex, searchItem) => {
-  const url = `getPlan?pageSize=10&isDelete=0&model=1&pageIndex=${pageIndex}${searchItem}`;
+  const url = `getPlan?pageSize=10&isDelete=0&model=3&pageIndex=${pageIndex}${searchItem}`;
   return requestHandle(url);
 };
 
 export const getPlanCount = async searchItem => {
-  const url = `getPlanCount?isDelete=0&model=1&${searchItem}`;
+  const url = `getPlanCount?isDelete=0&model=3&${searchItem}`;
   return requestHandle(url);
 };
 
 export const getPlanAllSum = async searchItem => {
-  const url = `getPlanAllSum?isDelete=0&model=1${searchItem}`;
+  const url = `getPlanAllSum?isDelete=0&model=3${searchItem}`;
   return requestHandle(url);
 };
 

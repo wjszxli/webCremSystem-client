@@ -5,29 +5,29 @@ export const getAllUserInfo = async () => {
   return requestHandle(url);
 };
 
-export const getNotificationData = async (pageIndex, searchItem) => {
-  let url = `getNotification?pageSize=10&pageIndex=${pageIndex}${searchItem}`;
+export const getPlayData = async (pageIndex, searchItem) => {
+  let url = `getPlay?pageSize=10&pageIndex=${pageIndex}${searchItem}`;
   const listData = (await requestHandle(url)) || [];
-  url = `getNotificationCount?${searchItem}`;
+  url = `getPlayCount?${searchItem}`;
   const [{ count }] = await requestHandle(url);
   return { listData, dataCount: count };
 };
 
-export const getOneNotificationData = async id => {
-  const url = `getOneNotification?id=${id}`;
+export const getOnePlayData = async id => {
+  const url = `getOnePlay?id=${id}`;
   return requestHandle(url);
 };
 
-export const deleteNotification = async id => {
-  const url = `deleteNotification?id=${id}`;
+export const deletePlay = async id => {
+  const url = `deletePlay?id=${id}`;
   const options = {
     method: "POST"
   };
   return requestHandle(url, options);
 };
 
-export const saveNotification = async body => {
-  const url = "saveNotification";
+export const savePlay = async body => {
+  const url = "savePlay";
   const options = { method: "POST", body };
   return requestHandle(url, options);
 };

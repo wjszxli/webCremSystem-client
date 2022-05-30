@@ -5,29 +5,29 @@ export const getAllUserInfo = async () => {
   return requestHandle(url);
 };
 
-export const getNotificationData = async (pageIndex, searchItem) => {
-  let url = `getNotification?pageSize=10&pageIndex=${pageIndex}${searchItem}`;
+export const getCameraData = async (pageIndex, searchItem) => {
+  let url = `getCamera?pageSize=10&pageIndex=${pageIndex}${searchItem}`;
   const listData = (await requestHandle(url)) || [];
-  url = `getNotificationCount?${searchItem}`;
+  url = `getCameraCount?${searchItem}`;
   const [{ count }] = await requestHandle(url);
   return { listData, dataCount: count };
 };
 
-export const getOneNotificationData = async id => {
-  const url = `getOneNotification?id=${id}`;
+export const getOneCameraData = async id => {
+  const url = `getOneCamera?id=${id}`;
   return requestHandle(url);
 };
 
-export const deleteNotification = async id => {
-  const url = `deleteNotification?id=${id}`;
+export const deleteCamera = async id => {
+  const url = `deleteCamera?id=${id}`;
   const options = {
     method: "POST"
   };
   return requestHandle(url, options);
 };
 
-export const saveNotification = async body => {
-  const url = "saveNotification";
+export const saveCamera = async body => {
+  const url = "saveCamera";
   const options = { method: "POST", body };
   return requestHandle(url, options);
 };

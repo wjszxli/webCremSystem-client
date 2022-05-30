@@ -10,7 +10,6 @@ import {
   Select,
   message,
   Pagination,
-  Upload,
   Popover
 } from "antd";
 import { exportTableToExcel } from "utils/ExportExcel";
@@ -35,13 +34,13 @@ const allAuthers = [
   { sell: false }
 ];
 const optionsData = [
-  "教育亲子",
-  "食品",
-  "美妆个护",
-  "电商",
-  "综合",
-  "男装",
-  "女装",
+  "食品饮料",
+  "日用百货",
+  "美妆护肤",
+  "母婴亲子",
+  "服饰内衣",
+  "厨卫家电",
+  "宠物用品",
   "其它"
 ];
 const optionsType = optionsData.map(value => (
@@ -119,14 +118,14 @@ export default Form.create()(
       const tag = flag ? "all" : "";
       searchItem += `&tag=${tag}`;
 
-      API.getNotificationData(pageIndex, searchItem).then(
+      API.getColonelData(pageIndex, searchItem).then(
         ({ listData, dataCount }) => {
           this.setState({ listData, dataCount });
         }
       );
     };
 
-    getOneNotification = async () => {
+    getOneColonel = async () => {
       const { selectedRowKeys, listData } = this.state;
       if (selectedRowKeys.length === 0) {
         message.error("请选中数据进行操作");
@@ -137,7 +136,7 @@ export default Form.create()(
         return;
       }
       const { id } = listData[selectedRowKeys[0]];
-      const editData = await API.getOneNotificationData(id);
+      const editData = await API.getOneColonelData(id);
       this.setState({
         editData,
         isAdd: false
@@ -172,9 +171,6 @@ export default Form.create()(
           const oldVal = value;
           val = value.replace(/(^\s*)|(\s*$)/g, "");
           switch (val) {
-            case "平台":
-              data.platform = item[oldVal].replace(/\s+/g, "");
-              break;
             case "ID":
               data.dataId = item[oldVal].replace(/\s+/g, "");
               break;
@@ -184,18 +180,21 @@ export default Form.create()(
             case "粉丝数":
               data.star = item[oldVal].replace(/\s+/g, "");
               break;
-            case "混播坑位费":
+            // case "直发刊例":
+            //   data.topTitle = item[oldVal].replace(/\s+/g, "");
+            //   break;
+            case "场均GMV":
               data.topCost = item[oldVal].replace(/\s+/g, "");
               break;
-            case "专场坑位费":
+            case "月均GMV":
+              data.secondTitle = item[oldVal].replace(/\s+/g, "");
+              break;
+            case "平均客单价":
               data.secondCost = item[oldVal].replace(/\s+/g, "");
               break;
-            case "佣金":
-              data.lastCost = item[oldVal].replace(/\s+/g, "");
-              break;
-            case "是否纯佣":
-              data.brush = item[oldVal].replace(/\s+/g, "");
-              break;
+            // case "是否刷号":
+            //   data.brush = item[oldVal].replace(/\s+/g, "");
+            //   break;
             case "类型":
               data.type = item[oldVal].replace(/\s+/g, "");
               break;
@@ -215,7 +214,7 @@ export default Form.create()(
           data.userId = userId;
         }
         console.log("data", data);
-        API.saveNotification(data).then(({ tip }) => {
+        API.saveColonel(data).then(({ tip }) => {
           message.success(tip);
         });
       });
@@ -241,7 +240,7 @@ export default Form.create()(
     };
 
     addDetail = async () => {
-      await this.getOneNotification();
+      await this.getOneColonel();
       this.setState({
         visibleRemark: true
       });
@@ -316,11 +315,11 @@ export default Form.create()(
     addData = () => {
       const { selectedRowKeys, listData } = this.state;
       if (!selectedRowKeys.length) {
-        message.error("请选择对应的达人添加排期");
+        message.error("请选择对应的团长纯佣添加排期");
         return;
       }
       if (selectedRowKeys.length > 1) {
-        message.error("一次只允许对一个达人添加排期");
+        message.error("一次只允许对一个团长纯佣添加排期");
         return;
       }
       this.setState({
@@ -334,14 +333,14 @@ export default Form.create()(
     showModify = async () => {
       const { selectedRowKeys, listData } = this.state;
       if (!selectedRowKeys.length) {
-        message.error("请选择对应的达人");
+        message.error("请选择对应的团长纯佣");
         return;
       }
       if (selectedRowKeys.length > 1) {
-        message.error("一次只允许对一个达人操作");
+        message.error("一次只允许对一个团长纯佣操作");
         return;
       }
-      await this.getOneNotification();
+      await this.getOneColonel();
       const { id } = listData[selectedRowKeys[0]];
 
       this.setState({
@@ -350,19 +349,19 @@ export default Form.create()(
       });
     };
 
-    // 删除达人
-    deleteNotification = async () => {
+    // 删除团长纯佣
+    deleteColonel = async () => {
       const { selectedRowKeys, listData } = this.state;
       if (!selectedRowKeys.length) {
-        message.error("请选择对应的达人");
+        message.error("请选择对应的团长纯佣");
         return;
       }
       if (selectedRowKeys.length > 1) {
-        message.error("一次只允许对一个达人操作");
+        message.error("一次只允许对一个团长纯佣操作");
         return;
       }
       const { id } = listData[selectedRowKeys[0]];
-      const { tip } = await API.deleteNotification(id);
+      const { tip } = await API.deleteColonel(id);
       if (tip) {
         message.success(tip);
         this.getPageData(1);
@@ -439,7 +438,7 @@ export default Form.create()(
               <Button type="primary" onClick={this.showModify}>
                 更新资源
               </Button>
-              <Button type="primary" onClick={this.deleteNotification}>
+              <Button type="primary" onClick={this.deleteColonel}>
                 删除
               </Button>
             </span>
@@ -482,9 +481,9 @@ export default Form.create()(
               </FormItem>
             </Col>
             <Col md={8} sm={24}>
-              <FormItem label="粉丝区间">
+              <FormItem label="场均GMV区间">
                 <InputGroup compact>
-                  {getFieldDecorator("starS", {
+                  {getFieldDecorator("topCostS", {
                     initialValue: ""
                   })(
                     <Input
@@ -502,7 +501,7 @@ export default Form.create()(
                     placeholder="~"
                     disabled
                   />
-                  {getFieldDecorator("starE", {
+                  {getFieldDecorator("topCostE", {
                     initialValue: ""
                   })(
                     <Input
@@ -516,9 +515,9 @@ export default Form.create()(
           </Row>
           <Row>
             <Col md={8} sm={24}>
-              <FormItem label="价格区间">
+              <FormItem label="月均GMV区间">
                 <InputGroup compact>
-                  {getFieldDecorator("priceS", {
+                  {getFieldDecorator("secondTitleS", {
                     initialValue: ""
                   })(
                     <Input
@@ -536,7 +535,7 @@ export default Form.create()(
                     placeholder="~"
                     disabled
                   />
-                  {getFieldDecorator("priceE", {
+                  {getFieldDecorator("secondTitleE", {
                     initialValue: ""
                   })(
                     <Input
@@ -548,46 +547,51 @@ export default Form.create()(
               </FormItem>
             </Col>
             <Col md={8} sm={24}>
-              <FormItem label="纯佣">
-                {getFieldDecorator("brush", {
-                  initialValue: ""
-                })(
-                  <Select style={{ width: "90%" }} placeholder="选择纯佣搜索">
-                    <Option value="是">是</Option>
-                    <Option value="否">否</Option>
-                  </Select>
-                )}
+              <FormItem label="客单价区间">
+                <InputGroup compact>
+                  {getFieldDecorator("secondCostS", {
+                    initialValue: ""
+                  })(
+                    <Input
+                      style={{ width: 80, textAlign: "center" }}
+                      placeholder="最低价"
+                    />
+                  )}
+                  <Input
+                    style={{
+                      width: 30,
+                      borderLeft: 0,
+                      pointerEvents: "none",
+                      backgroundColor: "#fff"
+                    }}
+                    placeholder="~"
+                    disabled
+                  />
+                  {getFieldDecorator("secondCostE", {
+                    initialValue: ""
+                  })(
+                    <Input
+                      style={{ width: 80, textAlign: "center", borderLeft: 0 }}
+                      placeholder="最高价"
+                    />
+                  )}
+                </InputGroup>
               </FormItem>
             </Col>
-            <Col md={8} sm={24}>
-              <FormItem label="平台">
-                {getFieldDecorator("platform", {
-                  initialValue: ""
-                })(
-                  <Select style={{ width: "90%" }} placeholder="选择平台搜索">
-                    <Option value="抖音">抖音</Option>
-                    <Option value="快手">快手</Option>
-                    <Option value="淘宝">淘宝</Option>
-                    <Option value="小红书">小红书</Option>
-                  </Select>
-                )}
-              </FormItem>
-            </Col>
-          </Row>
-          <Row>
             <Col md={8} sm={24}>
               <FormItem label="排序">
                 {getFieldDecorator("order", {
                   initialValue: ""
                 })(
                   <Select style={{ width: "90%" }} placeholder="选择刷号搜索">
-                    <Option value="topCost">混播坑位费排序</Option>
                     <Option value="star">粉丝数排序</Option>
                     <Option value="planCount">排期次数排序</Option>
                   </Select>
                 )}
               </FormItem>
             </Col>
+          </Row>
+          <Row>
             <Col md={8} sm={24}>
               <FormItem label="更新渠道">
                 {getFieldDecorator("updateRouter", {
@@ -631,16 +635,16 @@ export default Form.create()(
 
     render() {
       const columns = [
-        { title: "平台", dataIndex: "platform", key: "platform" },
         { title: "达人名称", dataIndex: "name", key: "name" },
         { title: "ID", dataIndex: "dataId", key: "dataId" },
         { title: "粉丝数", dataIndex: "star", key: "star" },
-        { title: "混播坑位费", dataIndex: "topCost", key: "topCost" },
-        { title: "专场坑位费", dataIndex: "secondCost", key: "secondCost" },
-        { title: "佣金", dataIndex: "lastCost", key: "lastCost" },
+        // { title: "直发刊例", dataIndex: "topTitle", key: "topTitle" },
+        { title: "场均GMV", dataIndex: "topCost", key: "topCost" },
+        { title: "月均GMV", dataIndex: "secondTitle", key: "secondTitle" },
+        { title: "平均客单价", dataIndex: "secondCost", key: "secondCost" },
         { title: "排期次数", dataIndex: "planCount", key: "planCount" },
-        { title: "是否纯佣", dataIndex: "brush", key: "brush" },
-        { title: "类型", dataIndex: "type", key: "type" },
+        // { title: "是否刷号", dataIndex: "brush", key: "brush" },
+        // { title: "类型", dataIndex: "type", key: "type" },
         {
           title: "录入时间",
           dataIndex: "newTime",
@@ -696,7 +700,7 @@ export default Form.create()(
       };
 
       return (
-        <PageHeaderLayout title="直播资源库">
+        <PageHeaderLayout title="团长纯佣资源库">
           {visible && (
             <AddPlan
               visible={visible}

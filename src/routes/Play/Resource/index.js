@@ -1,3 +1,4 @@
+/* eslint-disable comma-dangle */
 import React from "react";
 import {
   Table,
@@ -10,7 +11,6 @@ import {
   Select,
   message,
   Pagination,
-  Upload,
   Popover
 } from "antd";
 import { exportTableToExcel } from "utils/ExportExcel";
@@ -19,7 +19,6 @@ import moment from "moment";
 import { isAuth } from "utils/utils";
 import AddPlan from "./components/addPlan";
 import AddStart from "./components/addStart";
-import AddDetail from "./components/addDetail";
 import Modify from "./components/modify";
 import * as API from "./services";
 import PageHeaderLayout from "../../../layouts/PageHeaderLayout";
@@ -35,15 +34,23 @@ const allAuthers = [
   { sell: false }
 ];
 const optionsData = [
-  "教育亲子",
-  "食品",
-  "美妆个护",
-  "电商",
-  "综合",
-  "男装",
-  "女装",
-  "其它"
+  "运动健身",
+  "财经投资",
+  "萌宠美食",
+  "美妆",
+  "科技数码",
+  "生活",
+  "游戏汽车",
+  "母婴亲子",
+  "旅行",
+  "教育培训",
+  "情感",
+  "影视娱乐",
+  "家居家装",
+  "二次元",
+  "其他"
 ];
+
 const optionsType = optionsData.map(value => (
   <Option key={value}>{value}</Option>
 ));
@@ -119,14 +126,12 @@ export default Form.create()(
       const tag = flag ? "all" : "";
       searchItem += `&tag=${tag}`;
 
-      API.getNotificationData(pageIndex, searchItem).then(
-        ({ listData, dataCount }) => {
-          this.setState({ listData, dataCount });
-        }
-      );
+      API.getPlayData(pageIndex, searchItem).then(({ listData, dataCount }) => {
+        this.setState({ listData, dataCount });
+      });
     };
 
-    getOneNotification = async () => {
+    getOnePlay = async () => {
       const { selectedRowKeys, listData } = this.state;
       if (selectedRowKeys.length === 0) {
         message.error("请选中数据进行操作");
@@ -137,7 +142,7 @@ export default Form.create()(
         return;
       }
       const { id } = listData[selectedRowKeys[0]];
-      const editData = await API.getOneNotificationData(id);
+      const editData = await API.getOnePlayData(id);
       this.setState({
         editData,
         isAdd: false
@@ -172,9 +177,6 @@ export default Form.create()(
           const oldVal = value;
           val = value.replace(/(^\s*)|(\s*$)/g, "");
           switch (val) {
-            case "平台":
-              data.platform = item[oldVal].replace(/\s+/g, "");
-              break;
             case "ID":
               data.dataId = item[oldVal].replace(/\s+/g, "");
               break;
@@ -184,16 +186,19 @@ export default Form.create()(
             case "粉丝数":
               data.star = item[oldVal].replace(/\s+/g, "");
               break;
-            case "混播坑位费":
+            case "平台":
+              data.platform = item[oldVal].replace(/\s+/g, "");
+              break;
+            case "QS价格":
               data.topCost = item[oldVal].replace(/\s+/g, "");
               break;
-            case "专场坑位费":
-              data.secondCost = item[oldVal].replace(/\s+/g, "");
+            case "返点":
+              data.secondTitle = item[oldVal].replace(/\s+/g, "");
               break;
             case "佣金":
-              data.lastCost = item[oldVal].replace(/\s+/g, "");
+              data.secondCost = item[oldVal].replace(/\s+/g, "");
               break;
-            case "是否纯佣":
+            case "是否挂车":
               data.brush = item[oldVal].replace(/\s+/g, "");
               break;
             case "类型":
@@ -215,7 +220,7 @@ export default Form.create()(
           data.userId = userId;
         }
         console.log("data", data);
-        API.saveNotification(data).then(({ tip }) => {
+        API.savePlay(data).then(({ tip }) => {
           message.success(tip);
         });
       });
@@ -238,13 +243,6 @@ export default Form.create()(
         headers.push(hdr);
       }
       return headers;
-    };
-
-    addDetail = async () => {
-      await this.getOneNotification();
-      this.setState({
-        visibleRemark: true
-      });
     };
 
     upload = rawFile => {
@@ -316,11 +314,11 @@ export default Form.create()(
     addData = () => {
       const { selectedRowKeys, listData } = this.state;
       if (!selectedRowKeys.length) {
-        message.error("请选择对应的达人添加排期");
+        message.error("请选择对应的短视频添加排期");
         return;
       }
       if (selectedRowKeys.length > 1) {
-        message.error("一次只允许对一个达人添加排期");
+        message.error("一次只允许对一个短视频添加排期");
         return;
       }
       this.setState({
@@ -334,14 +332,14 @@ export default Form.create()(
     showModify = async () => {
       const { selectedRowKeys, listData } = this.state;
       if (!selectedRowKeys.length) {
-        message.error("请选择对应的达人");
+        message.error("请选择对应的短视频");
         return;
       }
       if (selectedRowKeys.length > 1) {
-        message.error("一次只允许对一个达人操作");
+        message.error("一次只允许对一个短视频操作");
         return;
       }
-      await this.getOneNotification();
+      await this.getOnePlay();
       const { id } = listData[selectedRowKeys[0]];
 
       this.setState({
@@ -350,19 +348,19 @@ export default Form.create()(
       });
     };
 
-    // 删除达人
-    deleteNotification = async () => {
+    // 删除短视频
+    deletePlay = async () => {
       const { selectedRowKeys, listData } = this.state;
       if (!selectedRowKeys.length) {
-        message.error("请选择对应的达人");
+        message.error("请选择对应的短视频");
         return;
       }
       if (selectedRowKeys.length > 1) {
-        message.error("一次只允许对一个达人操作");
+        message.error("一次只允许对一个短视频操作");
         return;
       }
       const { id } = listData[selectedRowKeys[0]];
-      const { tip } = await API.deleteNotification(id);
+      const { tip } = await API.deletePlay(id);
       if (tip) {
         message.success(tip);
         this.getPageData(1);
@@ -430,16 +428,13 @@ export default Form.create()(
               <Button type="primary" onClick={this.excelTable}>
                 导出EXCEL
               </Button>
-              <Button type="primary" onClick={this.addDetail}>
-                投放详情
-              </Button>
               <Button type="primary" onClick={this.handleUpload}>
                 上传新资源
               </Button>
               <Button type="primary" onClick={this.showModify}>
                 更新资源
               </Button>
-              <Button type="primary" onClick={this.deleteNotification}>
+              <Button type="primary" onClick={this.deletePlay}>
                 删除
               </Button>
             </span>
@@ -548,11 +543,11 @@ export default Form.create()(
               </FormItem>
             </Col>
             <Col md={8} sm={24}>
-              <FormItem label="纯佣">
+              <FormItem label="挂车">
                 {getFieldDecorator("brush", {
                   initialValue: ""
                 })(
-                  <Select style={{ width: "90%" }} placeholder="选择纯佣搜索">
+                  <Select style={{ width: "90%" }} placeholder="选择搜索">
                     <Option value="是">是</Option>
                     <Option value="否">否</Option>
                   </Select>
@@ -569,9 +564,24 @@ export default Form.create()(
                     <Option value="快手">快手</Option>
                     <Option value="淘宝">淘宝</Option>
                     <Option value="小红书">小红书</Option>
+                    <Option value="B站">B站</Option>
                   </Select>
                 )}
               </FormItem>
+            </Col>
+            <Col md={8} sm={24}>
+              {/* <FormItem label="平台">
+                {getFieldDecorator('platform', {
+                  initialValue: '',
+                })(
+                  <Select style={{ width: '90%' }} placeholder="选择平台搜索">
+                    <Option value="抖音">抖音</Option>
+                    <Option value="快手">快手</Option>
+                    <Option value="淘宝">淘宝</Option>
+                    <Option value="小红书">小红书</Option>
+                  </Select>
+                )}
+              </FormItem> */}
             </Col>
           </Row>
           <Row>
@@ -581,7 +591,7 @@ export default Form.create()(
                   initialValue: ""
                 })(
                   <Select style={{ width: "90%" }} placeholder="选择刷号搜索">
-                    <Option value="topCost">混播坑位费排序</Option>
+                    {/* <Option value="topCost">混播坑位费排序</Option> */}
                     <Option value="star">粉丝数排序</Option>
                     <Option value="planCount">排期次数排序</Option>
                   </Select>
@@ -635,11 +645,12 @@ export default Form.create()(
         { title: "达人名称", dataIndex: "name", key: "name" },
         { title: "ID", dataIndex: "dataId", key: "dataId" },
         { title: "粉丝数", dataIndex: "star", key: "star" },
-        { title: "混播坑位费", dataIndex: "topCost", key: "topCost" },
-        { title: "专场坑位费", dataIndex: "secondCost", key: "secondCost" },
-        { title: "佣金", dataIndex: "lastCost", key: "lastCost" },
-        { title: "排期次数", dataIndex: "planCount", key: "planCount" },
-        { title: "是否纯佣", dataIndex: "brush", key: "brush" },
+        // { title: "直发刊例", dataIndex: "topTitle", key: "topTitle" },
+        { title: "QS价格", dataIndex: "topCost", key: "topCost" },
+        { title: "返点", dataIndex: "secondTitle", key: "secondTitle" },
+        { title: "佣金", dataIndex: "secondCost", key: "secondCost" },
+        // { title: "排期次数", dataIndex: "planCount", key: "planCount" },
+        { title: "是否挂车", dataIndex: "brush", key: "brush" },
         { title: "类型", dataIndex: "type", key: "type" },
         {
           title: "录入时间",
@@ -696,7 +707,7 @@ export default Form.create()(
       };
 
       return (
-        <PageHeaderLayout title="直播资源库">
+        <PageHeaderLayout title="短视频资源库">
           {visible && (
             <AddPlan
               visible={visible}
@@ -707,15 +718,6 @@ export default Form.create()(
               selectedRowKeys={selectedRowKeys}
               listData={listData}
               current={current}
-            />
-          )}
-          {visibleRemark && (
-            <AddDetail
-              visibleRemark={visibleRemark}
-              onCancel={this.closeModel}
-              getPageData={this.getPageData}
-              editData={editData}
-              isAdd={isAdd}
             />
           )}
           {isShowStart && (

@@ -1,16 +1,16 @@
-import React, { createElement } from 'react';
-import { Spin } from 'antd';
-import pathToRegexp from 'path-to-regexp';
-import Loadable from 'react-loadable';
-import { getMenuData } from './menu';
-import ExportAll from '../routes/ExportAll'
+import React, { createElement } from "react";
+import { Spin } from "antd";
+import pathToRegexp from "path-to-regexp";
+import Loadable from "react-loadable";
+import { getMenuData } from "./menu";
+import ExportAll from "../routes/ExportAll";
 
 let routerDataCache;
 
 const modelNotExisted = (app, model) =>
   // eslint-disable-next-line
   !app._models.some(({ namespace }) => {
-    return namespace === model.substring(model.lastIndexOf('/') + 1);
+    return namespace === model.substring(model.lastIndexOf("/") + 1);
   });
 
 // wrapper of dynamic
@@ -25,14 +25,14 @@ const dynamicWrapper = (app, models, component) => {
 
   // () => require('module')
   // transformed by babel-plugin-dynamic-import-node-sync
-  if (component.toString().indexOf('.then(') < 0) {
+  if (component.toString().indexOf(".then(") < 0) {
     return props => {
       if (!routerDataCache) {
         routerDataCache = getRouterData(app);
       }
       return createElement(component().default, {
         ...props,
-        routerData: routerDataCache,
+        routerData: routerDataCache
       });
     };
   }
@@ -47,13 +47,13 @@ const dynamicWrapper = (app, models, component) => {
         return props =>
           createElement(Component, {
             ...props,
-            routerData: routerDataCache,
+            routerData: routerDataCache
           });
       });
     },
     loading: () => {
       return <Spin size="large" className="global-spin" />;
-    },
+    }
   });
 };
 
@@ -72,83 +72,172 @@ function getFlatMenuData(menus) {
 
 export const getRouterData = app => {
   const routerConfig = {
-    '/': {
-      component: dynamicWrapper(app, ['user', 'login'], () => import('../layouts/BasicLayout')),
+    "/": {
+      component: dynamicWrapper(app, ["user", "login"], () =>
+        import("../layouts/BasicLayout")
+      )
     },
-    '/resource/resource': {
-      component: dynamicWrapper(app, [], () => import('../routes/Resource/resource')),
+    "/resource/resource": {
+      component: dynamicWrapper(app, [], () =>
+        import("../routes/Resource/resource")
+      )
     },
-    '/resource/havaplan': {
-      component: dynamicWrapper(app, ['customer'], () => import('../routes/havePlan/havePlan')),
+    "/resource/havaplan": {
+      component: dynamicWrapper(app, ["customer"], () =>
+        import("../routes/havePlan/havePlan")
+      )
     },
-    '/resource/removeplan': {
-      component: dynamicWrapper(app, ['customer'], () => import('../routes/removePlan/removePlan')),
+    "/resource/removeplan": {
+      component: dynamicWrapper(app, ["customer"], () =>
+        import("../routes/removePlan/removePlan")
+      )
     },
-    '/notification/resource': {
-      component: dynamicWrapper(app, [], () => import('../routes/Notification/Resource')),
+    "/notification/resource": {
+      component: dynamicWrapper(app, [], () =>
+        import("../routes/Notification/Resource")
+      )
     },
-    '/notification/havaplan': {
-      component: dynamicWrapper(app, ['customer'], () => import('../routes/Notification/HavaPlan')),
+    "/notification/havaplan": {
+      component: dynamicWrapper(app, ["customer"], () =>
+        import("../routes/Notification/HavaPlan")
+      )
     },
-    '/notification/removeplan': {
-      component: dynamicWrapper(app, ['customer'], () => import('../routes/Notification/RemovePlan')),
+    "/notification/removeplan": {
+      component: dynamicWrapper(app, ["customer"], () =>
+        import("../routes/Notification/RemovePlan")
+      )
     },
-    '/weibo/resource': {
-      component: dynamicWrapper(app, [], () => import('../routes/Weibo/Resource')),
+    "/weibo/resource": {
+      component: dynamicWrapper(app, [], () =>
+        import("../routes/Weibo/Resource")
+      )
     },
-    '/weibo/havaplan': {
-      component: dynamicWrapper(app, ['customer'], () => import('../routes/Weibo/HavaPlan')),
+    "/weibo/havaplan": {
+      component: dynamicWrapper(app, ["customer"], () =>
+        import("../routes/Weibo/HavaPlan")
+      )
     },
-    '/weibo/removeplan': {
-      component: dynamicWrapper(app, ['customer'], () => import('../routes/Weibo/RemovePlan')),
+    "/weibo/removeplan": {
+      component: dynamicWrapper(app, ["customer"], () =>
+        import("../routes/Weibo/RemovePlan")
+      )
     },
-    '/customer/customer': {
-      component: dynamicWrapper(app, ['customer'], () => import('../routes/Customer/customer')),
+    "/play/resource": {
+      component: dynamicWrapper(app, [], () =>
+        import("../routes/Play/Resource")
+      )
     },
-    '/customer/publicresource': {
-      component: dynamicWrapper(app, ['customer'], () => import('../routes/PublicResource/PublicResource')),
+    "/play/havaplan": {
+      component: dynamicWrapper(app, ["customer"], () =>
+        import("../routes/Play/HavaPlan")
+      )
     },
-    '/system/modifypassword': {
-      component: dynamicWrapper(app, ['customer'], () => import('../routes/ModifyPassword/ModifyPassword')),
+    "/play/removeplan": {
+      component: dynamicWrapper(app, ["customer"], () =>
+        import("../routes/Play/RemovePlan")
+      )
     },
-    '/system/account': {
-      component: dynamicWrapper(app, ['customer'], () => import('../routes/Account/Account')),
+    "/colonel/resource": {
+      component: dynamicWrapper(app, [], () =>
+        import("../routes/Colonel/Resource")
+      )
     },
-    '/exportAll': {
-      component: ExportAll,
+    "/colonel/havaplan": {
+      component: dynamicWrapper(app, ["customer"], () =>
+        import("../routes/Colonel/HavaPlan")
+      )
     },
-    '/exception/403': {
-      component: dynamicWrapper(app, [], () => import('../routes/Exception/403')),
+    "/colonel/removeplan": {
+      component: dynamicWrapper(app, ["customer"], () =>
+        import("../routes/Colonel/RemovePlan")
+      )
     },
-    '/exception/404': {
-      component: dynamicWrapper(app, [], () => import('../routes/Exception/404')),
+    "/camera/resource": {
+      component: dynamicWrapper(app, [], () =>
+        import("../routes/Camera/Resource")
+      )
     },
-    '/exception/500': {
-      component: dynamicWrapper(app, [], () => import('../routes/Exception/500')),
+    "/camera/havaplan": {
+      component: dynamicWrapper(app, ["customer"], () =>
+        import("../routes/Camera/HavaPlan")
+      )
     },
-    '/exception/trigger': {
-      component: dynamicWrapper(app, ['error'], () =>
-        import('../routes/Exception/triggerException')
-      ),
+    "/camera/removeplan": {
+      component: dynamicWrapper(app, ["customer"], () =>
+        import("../routes/Camera/RemovePlan")
+      )
     },
-    '/user': {
-      component: dynamicWrapper(app, [], () => import('../layouts/UserLayout')),
+    "/customer/customer": {
+      component: dynamicWrapper(app, ["customer"], () =>
+        import("../routes/Customer/customer")
+      )
     },
-    '/user/login': {
-      component: dynamicWrapper(app, ['login'], () => import('../routes/User/Login')),
+    "/customer/publicresource": {
+      component: dynamicWrapper(app, ["customer"], () =>
+        import("../routes/PublicResource/PublicResource")
+      )
     },
-    '/upload': {
-      component: dynamicWrapper(app, ['login'], () => import('../routes/upload')),
+    "/system/modifypassword": {
+      component: dynamicWrapper(app, ["customer"], () =>
+        import("../routes/ModifyPassword/ModifyPassword")
+      )
     },
-    '/system/author': {
-      component: dynamicWrapper(app, ['login'], () => import('../routes/Author/author')),
+    "/system/account": {
+      component: dynamicWrapper(app, ["customer"], () =>
+        import("../routes/Account/Account")
+      )
     },
-    '/system/dept': {
-      component: dynamicWrapper(app, ['login'], () => import('../routes/Dept/dept')),
+    "/exportAll": {
+      component: ExportAll
     },
-    '/system/change': {
-      component: dynamicWrapper(app, ['login'], () => import('../routes/Change/index')),
+    "/exception/403": {
+      component: dynamicWrapper(app, [], () =>
+        import("../routes/Exception/403")
+      )
     },
+    "/exception/404": {
+      component: dynamicWrapper(app, [], () =>
+        import("../routes/Exception/404")
+      )
+    },
+    "/exception/500": {
+      component: dynamicWrapper(app, [], () =>
+        import("../routes/Exception/500")
+      )
+    },
+    "/exception/trigger": {
+      component: dynamicWrapper(app, ["error"], () =>
+        import("../routes/Exception/triggerException")
+      )
+    },
+    "/user": {
+      component: dynamicWrapper(app, [], () => import("../layouts/UserLayout"))
+    },
+    "/user/login": {
+      component: dynamicWrapper(app, ["login"], () =>
+        import("../routes/User/Login")
+      )
+    },
+    "/upload": {
+      component: dynamicWrapper(app, ["login"], () =>
+        import("../routes/upload")
+      )
+    },
+    "/system/author": {
+      component: dynamicWrapper(app, ["login"], () =>
+        import("../routes/Author/author")
+      )
+    },
+    "/system/dept": {
+      component: dynamicWrapper(app, ["login"], () =>
+        import("../routes/Dept/dept")
+      )
+    },
+    "/system/change": {
+      component: dynamicWrapper(app, ["login"], () =>
+        import("../routes/Change/index")
+      )
+    }
   };
   // Get name from ./menu.js or just set it in the router data.
   const menuData = getFlatMenuData(getMenuData());
@@ -161,7 +250,9 @@ export const getRouterData = app => {
     // Regular match item name
     // eg.  router /user/:id === /user/chen
     const pathRegexp = pathToRegexp(path);
-    const menuKey = Object.keys(menuData).find(key => pathRegexp.test(`${key}`));
+    const menuKey = Object.keys(menuData).find(key =>
+      pathRegexp.test(`${key}`)
+    );
     let menuItem = {};
     // If menuKey is not empty
     if (menuKey) {
@@ -175,7 +266,7 @@ export const getRouterData = app => {
       ...router,
       name: router.name || menuItem.name,
       authority: router.authority || menuItem.authority,
-      hideInBreadcrumb: router.hideInBreadcrumb || menuItem.hideInBreadcrumb,
+      hideInBreadcrumb: router.hideInBreadcrumb || menuItem.hideInBreadcrumb
     };
     routerData[path] = router;
   });
