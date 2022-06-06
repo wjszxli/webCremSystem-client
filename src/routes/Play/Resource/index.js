@@ -649,7 +649,7 @@ export default Form.create()(
         { title: "QS价格", dataIndex: "topCost", key: "topCost" },
         { title: "返点", dataIndex: "secondTitle", key: "secondTitle" },
         { title: "佣金", dataIndex: "secondCost", key: "secondCost" },
-        // { title: "排期次数", dataIndex: "planCount", key: "planCount" },
+        { title: "排期次数", dataIndex: "planCount", key: "planCount" },
         { title: "是否挂车", dataIndex: "brush", key: "brush" },
         { title: "类型", dataIndex: "type", key: "type" },
         {

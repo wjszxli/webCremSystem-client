@@ -644,7 +644,7 @@ export default Form.create()(
         { title: "平均客单价", dataIndex: "secondCost", key: "secondCost" },
         { title: "排期次数", dataIndex: "planCount", key: "planCount" },
         // { title: "是否刷号", dataIndex: "brush", key: "brush" },
-        // { title: "类型", dataIndex: "type", key: "type" },
+        { title: "类型", dataIndex: "type", key: "type" },
         {
           title: "录入时间",
           dataIndex: "newTime",

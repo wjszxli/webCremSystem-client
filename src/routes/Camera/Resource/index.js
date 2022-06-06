@@ -1,4 +1,5 @@
 import React from "react";
+import moment from "moment";
 import {
   Table,
   Card,
@@ -638,29 +639,29 @@ export default Form.create()(
         { title: "短视频价格", dataIndex: "topCost", key: "topCost" },
         // { title: "原创刊例", dataIndex: "secondTitle", key: "secondTitle" },
         { title: "直播价格", dataIndex: "secondCost", key: "secondCost" },
-        // { title: "排期次数", dataIndex: "planCount", key: "planCount" },
+        { title: "排期次数", dataIndex: "planCount", key: "planCount" },
         // { title: "是否刷号", dataIndex: "brush", key: "brush" },
-        // {
-        //   title: "录入时间",
-        //   dataIndex: "newTime",
-        //   key: "newTime",
-        //   render: val => (
-        //     <span>
-        //       {Number(val)
-        //         ? moment(Number(val)).format("YYYY-MM-DD HH:mm:ss")
-        //         : ""}
-        //     </span>
-        //   )
-        // },
-        // {
-        //   title: "更新时间",
-        //   dataIndex: "updateTime",
-        //   key: "updateTime",
-        //   render: val => (
-        //     <span>{moment(val).format("YYYY-MM-DD HH:mm:ss")}</span>
-        //   )
-        // },
-        // { title: "更新渠道", dataIndex: "updateRouter", key: "updateRouter" },
+        {
+          title: "录入时间",
+          dataIndex: "newTime",
+          key: "newTime",
+          render: val => (
+            <span>
+              {Number(val)
+                ? moment(Number(val)).format("YYYY-MM-DD HH:mm:ss")
+                : ""}
+            </span>
+          )
+        },
+        {
+          title: "更新时间",
+          dataIndex: "updateTime",
+          key: "updateTime",
+          render: val => (
+            <span>{moment(val).format("YYYY-MM-DD HH:mm:ss")}</span>
+          )
+        },
+        { title: "更新渠道", dataIndex: "updateRouter", key: "updateRouter" },
         {
           title: "备注",
           dataIndex: "remark",

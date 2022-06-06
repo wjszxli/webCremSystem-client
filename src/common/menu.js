@@ -52,6 +52,10 @@ const menuData = [
       {
         name: "短视频排期列表",
         path: "havaplan"
+      },
+      {
+        name: "作废排期",
+        path: "removeplan"
       }
     ]
   },
@@ -67,6 +71,10 @@ const menuData = [
       {
         name: "团长纯佣排期列表",
         path: "havaplan"
+      },
+      {
+        name: "作废排期",
+        path: "removeplan"
       }
     ]
   },
@@ -101,6 +109,10 @@ const menuData = [
       {
         name: "视频号排期列表",
         path: "havaplan"
+      },
+      {
+        name: "作废排期",
+        path: "removeplan"
       }
     ]
   },
