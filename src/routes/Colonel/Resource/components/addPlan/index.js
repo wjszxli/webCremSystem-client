@@ -244,17 +244,17 @@ export default Form.create()(
           <Form className="ant-advanced-search-form">
             <Row>
               <Col span={12}>
-                <FormItem {...formItemLayout} label="微博名称">
+                <FormItem {...formItemLayout} label="达人名称">
                   {getFieldDecorator("publicNumber", {
                     initialValue: "",
                     rules: [
                       {
                         required: true,
                         whitespace: true,
-                        message: "输入微博名称"
+                        message: "输入达人名称"
                       }
                     ]
-                  })(<Input placeholder="输入微博名称" disabled={isAdd} />)}
+                  })(<Input placeholder="输入达人名称" disabled={isAdd} />)}
                 </FormItem>
               </Col>
               {/* <Col span={12}>
